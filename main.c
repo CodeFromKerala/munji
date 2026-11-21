@@ -183,7 +183,7 @@ int tokenize(char input[256][256], int len){
 			j++; a++;
 		}
 		j--;
-		newToken = initToken(4, a + 1, newString); isToken = 1;
+		newToken = initToken(4, a, newString); isToken = 1;
 		cleanString(newString);
       }
 	  if (isToken){
