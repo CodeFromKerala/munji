@@ -187,9 +187,9 @@ int tokenize(char input[256][256], int len){
 		cleanString(newString);
       }
 	  if (isToken){
-		program[k] = newToken;
-		k++;
-	  }
+		  program[k] = newToken;
+		  k++;
+	    }
     }
   }
   return k;
