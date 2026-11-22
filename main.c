@@ -29,7 +29,6 @@ char validChar[] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 };
 struct KeyWord *keywords[256];
-char line[256];
 char input[256][256];
 
 int tokenize(char input[256][256], int len);
@@ -46,9 +45,9 @@ struct KeyWord *initKeyword(int len, char keyword[256]);
 struct Token *initToken(int type, int size, char *token);
 void cleanString(char *string);
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
 	int debug = 0;
-	if (argc < 2){
+	if (argc < 2) {
 		printf("Enter a file, dumbass \n");
 		return 1;
 	}
@@ -90,11 +89,11 @@ int parse(char *filename){
 		perror(filename);
 		return 1;
 	}
-
+	char line[256];
 	int i = 0;
 	while (fgets(line, sizeof(line), fp) != NULL){
-		for (int j = 0; j < 256; j++){
-      input[i][j] = line[j];
+		for (int j = 0; j < 256; j++) {
+      		input[i][j] = line[j];
     }
 		i++;
 	}
@@ -169,6 +168,8 @@ int tokenize(char input[256][256], int len){
   char newString[256];
   for (int i = 0; i < len; i++){
     for (int j = 0; j < 256; j++){
+		if (input[i][j] == '\0')
+				break;
 	  isToken = 0;
       if (isOperator(input[i][j])){
         newToken = initToken(1, 1, &input[i][j]); isToken = 1;
