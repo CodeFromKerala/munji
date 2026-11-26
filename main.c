@@ -15,7 +15,16 @@ struct Token{
 
 struct KeyWord{
 	int len;
-	char keyword[256];
+	char keyword[MAX_LINES];
+};
+
+struct Data{
+  int integer;
+  char character;
+  float floating;
+  char string[MAX_LINES];
+  char identifier[MAX_LINES];
+  int id;
 };
 
 struct Token *program[MAX_TOKEN];
@@ -28,22 +37,30 @@ char validChar[] = {
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 };
-struct KeyWord *keywords[256];
-char input[256][256];
+struct KeyWord *keywords[MAX_LINES];
+char input[MAX_LINES][MAX_LINES];
 
-int tokenize(char input[256][256], int len);
+/* TOKENIZER */
+int tokenize(char input[MAX_INPUT][MAX_INPUT], int len);
 void cleanupTokenize(int len, int keyword_len);
-void evaluate();
 int isOperator(char c);
 int isBraces(char c);
-void printProgram(int len);
+
+/* PARSER */
 int parse(char *filename);
+
+/* Evaluator */
+int evaluator(int len);
+struct Data *initData(char identifier[MAX_LINES], int integer, char character, float floating, char string[MAX_LINES]);
+int addData(struct Data *data);
+void freeData(struct Data *head, int id);
 
 
 // Helper Functions
-struct KeyWord *initKeyword(int len, char keyword[256]);
+struct KeyWord *initKeyword(int len, char keyword[MAX_INPUT]);
 struct Token *initToken(int type, int size, char *token);
 void cleanString(char *string);
+void printProgram(int len);
 
 int main(int argc, char *argv[]) {
 	int debug = 0;
@@ -58,12 +75,8 @@ int main(int argc, char *argv[]) {
 	if (argv[2]){
 		debug = 1;
 	}
-	char newString[256];
-	newString[0] = 'p';
-	newString[1] = 'r';
-	newString[2] = 'i';
-	newString[3] = 'n';
-	newString[4] = 't';
+	char newString[MAX_INPUT] = "print";
+	newString[5] = '\0';
 	struct KeyWord *printfunc = initKeyword(5, newString);
 	keywords[0] = printfunc;
 	int num_tokens = tokenize(input, max);
@@ -71,10 +84,11 @@ int main(int argc, char *argv[]) {
 	if (debug){
 		printProgram(num_tokens);
 	}
+    printf("%d", evaluator(num_tokens));
 	return 0;
 }
 
-struct KeyWord *initKeyword(int len, char keyword[256]){
+struct KeyWord *initKeyword(int len, char keyword[MAX_INPUT]){
 	struct KeyWord *newKeyword = malloc(sizeof(struct KeyWord));
 	newKeyword -> len = len;
 	for (int i = 0; i < len; i++){
@@ -89,10 +103,10 @@ int parse(char *filename){
 		perror(filename);
 		return 1;
 	}
-	char line[256];
+	char line[MAX_INPUT];
 	int i = 0;
 	while (fgets(line, sizeof(line), fp) != NULL){
-		for (int j = 0; j < 256; j++) {
+		for (int j = 0; j < MAX_INPUT; j++) {
       		input[i][j] = line[j];
     }
 		i++;
@@ -101,7 +115,7 @@ int parse(char *filename){
 	return i;
 }
 
-struct Token *initToken(int type, int size, char token[256]){
+struct Token *initToken(int type, int size, char token[MAX_INPUT]){
 	struct Token *newToken = malloc(sizeof(struct Token));
 	for (int i = 0; i < size; i++){
 		(newToken -> token)[i] = token[i];
@@ -154,20 +168,20 @@ void printProgram(int len){
 }
 
 void cleanString(char *string){
-	for (int i = 0; i < 256; i++){
+	for (int i = 0; i < MAX_INPUT; i++){
 		*(string + i) = ' ';
 	}
 }
 
-int tokenize(char input[256][256], int len){
+int tokenize(char input[MAX_INPUT][MAX_INPUT], int len){
   struct Token *newToken;
   int isToken = 0;
   int length = 0;
   int a = 0, k = 0;
   int init;
-  char newString[256];
+  char newString[MAX_INPUT];
   for (int i = 0; i < len; i++){
-    for (int j = 0; j < 256; j++){
+    for (int j = 0; j < MAX_INPUT; j++){
 		if (input[i][j] == '\0')
 				break;
 	  isToken = 0;
@@ -210,7 +224,17 @@ void cleanupTokenize(int len, int keyword_len){
 				if (isKeyword){
 					program[i] -> type = 5;
 				}
+        (program[i] -> token)[program[i] -> size] = '\0';
 			}
 		}
 	}
+}
+
+int evaluator(int len){
+  for (int i = 0; i < len; i++){
+    if (program[i] -> type == 5){
+		printf("%s", program[i] -> token == "print");
+    }
+  }
+  return 1;
 }
